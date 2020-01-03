@@ -19,7 +19,7 @@
             type="password"
             placeholder="密码"
             :routs="/^\S{3,16}$/"
-            :msg="'密码错误'"
+            :msg="'密码格式错误'"
             v-model="user.password"
           ></myput>
         </div>
@@ -36,6 +36,7 @@
 <script>
 import btn from "@/components/mybtn.vue";
 import myput from "@/components/myinput.vue";
+import { login } from "@/apis/user.js";
 export default {
   components: {
     btn,
@@ -50,8 +51,23 @@ export default {
     };
   },
   methods: {
-    isclick() {
-      console.log(this.user);
+    async isclick() {
+      if (
+        /^(\d{5,6})$|^(1\d{10})$/.test(this.user.username) &&
+        /^\S{3,16}$/.test(this.user.password)
+      ) {
+        let res = await login(this.user);
+        console.log(res);
+        if (res.data.message === "用户不存在") {
+          this.$toast.fail(res.data.message);
+        } else {
+          localStorage.setItem("key", res.data.data.token);
+          localStorage.setItem("userInfo", JSON.stringify(res.data.data.user));
+          this.$router.push({ name: "Personal" });
+        }
+      } else {
+        this.$toast.fail("用户数据输入不合法");
+      }
     },
     getname(data) {
       this.user.username = data;

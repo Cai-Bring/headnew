@@ -22,7 +22,10 @@ export default {
     },
     haveblur() {
       if (this.status == false) {
-        console.log(this.msg);
+        this.$toast.fail({
+          message: this.msg || "输入不正确",
+          duration: 2000
+        });
       }
     }
   }
