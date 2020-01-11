@@ -1,5 +1,5 @@
 <template>
-  <div class="btn" @click="hadbtn">
+  <div class="mybtn" @click="hadbtn">
     <slot></slot>
   </div>
 </template>
@@ -15,7 +15,7 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.btn {
+.mybtn {
   width: 318 * 100vw/360;
   height: 50px;
   background-color: pink;

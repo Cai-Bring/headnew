@@ -1,5 +1,5 @@
 <template>
-  <div class="login">
+  <div class="register">
     <div id="app">
       <div class="container">
         <div class="close">
@@ -10,24 +10,30 @@
         </div>
         <div class="inputs">
           <myput
-            placeholder="请输入手机号或用户名"
-            :msg="'请输入正确用户名'"
-            :routs="/^(\d{5,6})$|^(1\d{10})$/"
-            @input="getname"
+            placeholder="手机号码"
+            :routs="/^1[0-9]{4,10}$/"
+            :msg="'手机号码格式不正确'"
+            v-model="user.username"
           ></myput>
           <myput
-            type="password"
+            placeholder="昵称"
+            :routs="/^[0-9a-zA-Z\u4e00-\u9fa5]{2,6}$/"
+            :msg="'昵称格式不正确'"
+            v-model="user.nickname"
+          ></myput>
+          <myput
             placeholder="密码"
-            :routs="/^\S{3,16}$/"
-            :msg="'密码格式错误'"
+            type="password"
+            :routs="/^[0-9a-zA-Z]{3,12}$/"
+            :msg="'密码格式不正确'"
             v-model="user.password"
           ></myput>
         </div>
         <p class="tips">
-          没有账号？
-          <a href="#/register">去注册</a>
+          有账号？
+          <a href="#/login" class>去登录</a>
         </p>
-        <btn @click="isclick">登录</btn>
+        <btn @click="isclick">注册</btn>
       </div>
     </div>
   </div>
@@ -36,7 +42,7 @@
 <script>
 import btn from "@/components/mybtn.vue";
 import myput from "@/components/myinput.vue";
-import { login } from "@/apis/user.js";
+import { register } from "@/apis/user.js";
 export default {
   components: {
     btn,
@@ -46,31 +52,28 @@ export default {
     return {
       user: {
         username: "",
-        password: ""
+        password: "",
+        nickname: ""
       }
     };
   },
   methods: {
     async isclick() {
       if (
-        /^(\d{5,6})$|^(1\d{10})$/.test(this.user.username) &&
-        /^\S{3,16}$/.test(this.user.password)
+        /^1[0-9]{4,10}$/.test(this.user.username) &&
+        /^[0-9a-zA-Z\u4e00-\u9fa5]{2,6}$/.test(this.user.nickname) &&
+        /^[0-9a-zA-Z]{3,12}$/.test(this.user.password)
       ) {
-        let res = await login(this.user);
-        // console.log(res);
-        if (res.data.message === "用户不存在") {
+        let res = await register(this.user);
+        console.log(res);
+        if (res.data.message === "用户名已经存在") {
           this.$toast.fail(res.data.message);
         } else {
-          localStorage.setItem("key", res.data.data.token);
-          localStorage.setItem("userInfo", res.data.data.user.id);
-          this.$router.push({ path: `/personal/${res.data.data.user.id}` });
+          this.$router.push({ name: "Login" });
         }
       } else {
-        this.$toast.fail("用户数据输入不合法");
+        this.$toast.fail("请输入正确格式的数据");
       }
-    },
-    getname(data) {
-      this.user.username = data;
     }
   }
 };
